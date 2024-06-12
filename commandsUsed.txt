@@ -1,0 +1,4 @@
+to compile c++ file
+g++ file_opener.cpp
+to execute the executable file 
+.\a.exe test.cpp
