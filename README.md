@@ -14,3 +14,11 @@ Implement analyser phase of compilers
 Complete The project :)
 </li>
 </ul>
+
+<ol>
+ <li>
+ in the commit 3a08a229d7db2762012b5a4f775a8e670feea7fd i have created a file called file_opener.cpp basically calcutes leanght and using file it will send all charcaters in the test file 
+   as charcter stream into scanner 
+ </li>
+
+</ol>
