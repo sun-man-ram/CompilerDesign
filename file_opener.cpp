@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<iostream>
 #include<bits/stdc++.h>
+#include "scanner.h"
 using namespace std;
 
 int main(int argc,char** argv){
@@ -23,7 +24,7 @@ int main(int argc,char** argv){
     else{
     fread(buffer,sizeof(char),fileSize,filePointer);
     cout<<"file opened successfully";
-    // scanner(buffer);
+    scanner(buffer);
     }
     delete buffer;
     fclose(filePointer);

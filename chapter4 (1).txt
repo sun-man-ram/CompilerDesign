@@ -1,0 +1,37 @@
+In this lesson, we would start initializing all the functions we called in our scanner.
+The first function is the  end_of_file of file function which checks if the current token is 
+'/0' or end of file. if it is end of file , it returns true and our scanner while loop terminates and calls the maketoken to make token end of file.
+
+It is a static function because we need it only in this file and it is also a Boolean function because it returns only true or false. 
+
+Next is the skip_whitespaces function just above the end of file function.
+we also declare skipttokens function which we would used to skip the whitespaces later.
+while we are generating our tokens we also want to store the line number where the token appeared, this will be useful if we want to report an error, we can aswell tell which line it appeared. 
+so we create the global line variable, and set it to one, with all c++ plus starts at line one and not zero. 
+
+The list of whitespaces includes: spaces ‘ ’ i.e empty space, newline ‘/n’, tab  ‘/t’, carriage return /r‘,  single line comment ‘//’, multi line comment ‘/**’, ‘**/’. 
+
+ In our skipwhitespace function, we use a switch to match the current token with each of the whitespace character. If a match is found we increment our token to point to the next character and check again. The aim is to ignore them, so we do nothing except to increment to the next character until the current token is no longer a whitespace, then we continue. 
+
+if the whitespace is a new line, we increment our token line number aswell. 
+
+On line 29, we check for single line and multi line comment. In c and cpp we do not compile comment just like the rest of the whitespaces. So whenever we meet a single line comment we skip everything that comes after it until we meet a new line and whenever we meet a multi line comment we skip everything that comes after it until we meet the ‘*/’  which is used to terminate it. 
+so on line 29, we check if the current token is a slash, then we check if the next token is another slash , then it is a single line comment. then using the help of the skiptokens function we skip all tokens until we need a new line. so we use the new line as an argument to the skip token function.
+then if the next token is an asterisk then it is a multi line comment, so we skip all tokens until we meet the */ tokens. 
+we use the skip tokens function which uses two argument and assigns  asterisk and slash as the argument. 
+else the token is a slash or division, so we call the make token function to generate the token. 
+
+1. Division = ‘/’. 
+2. single line comment = ‘//’
+3. multi line comment = ‘/*’
+
+Therefore it is necessary to check the next token that comes after it without incrementing token. If it is ‘/’ then it is a single line comment , if it ‘*’ it is a multi line comment else it is division and we call make token slash on line 40, and call skipwhitespace function again. 
+
+ let us initialize the skip tokens function. We implement it using polymorphism for the single line comment and double line comment. 
+ The skip tokens function eliminates comments by skipping tokens using a while loop  until it meets the passed argument or new line for the case of single line comment and ‘*/’ for multi line comment. It also makes sure we do not meet the end of file unexpectedly in the case of unterminated comment.
+ we would loop till file ends. Then we check for end of file if it is true, it means we did not terminate the comments , we call the error function.  The error function takes two arguments, the error to report which is a string and the line number where it occurred. we will declare it in our parser.h file.
+
+On line 31, we increment the token by two, so that we skip the two terminating tokens ‘*/’, used for multi line comment. For single line comment we do not increment the token since it is terminated when we meet a new line which will be skipped by the skip tokens function.
+
+In this tutorial we have seen how the scanner scans whitespaces, in our next tutorial we will scan numbers and alphabets. 
+Please, if you find any part confusing, as a student please send me an email ; ezeuko.arinze@projectfpga.com . avoid leaving a bad review, it took a great deal of hardwork to arrange this course. if you enjoy it, please give it a five star and a nice review.
