@@ -76,10 +76,125 @@ void skip_whitespace(){
  }
 }
 void generateToken(TokenType type);
-bool isNum(char a);
-void keywordToken();
+bool isNum(char B){
+    // to convert thr char type to integer we subract it with 0 and assign to integer
+
+   int A=B-'0';
+   if(A >=0 && A<=9 ){
+     return true;
+   }
+   else{
+      return false;
+   }
+}
+static bool checkKeyword(string charValue, int numChar, TokenType type){
+    if(!(isAlphabet(token[numChar+1])) && !(isNum(token[numChar+1]))){
+
+        for(int i = numChar; i > 0; i--){ 
+                    
+            if(charValue[i-1] != token[i]){
+
+                return false;
+            }
+        }
+        if(type ==TOKEN_ENDL){
+            makeToken("'/n'",TOKEN_STRING);
+        }else        
+        {
+        makeToken(type); 
+        }return true;
+    }return false;
+}
+static void keywordToken(){
+    switch(*token){
+        case 'b':
+            if(checkKeyword( "reak", 4, TOKEN_BREAK)){token = token+4;}
+            else if(checkKeyword("ool", 3, TOKEN_BOOL)){token = token+3;}              
+            else{generateToken(TOKEN_IDENTIFIER);}
+            break;
+        case 'c':
+            if(checkKeyword("ase", 3, TOKEN_CASE)){token = token+3;}
+            else if(checkKeyword("out", 3, TOKEN_COUT)){token = token+3;}
+            else if(checkKeyword("ontinue", 7, TOKEN_CONTINUE)){token = token+7;}                           
+            else{generateToken(TOKEN_IDENTIFIER);}
+            break;
+        case 'd':
+            if(checkKeyword("efault", 6, TOKEN_DEFAULT)){token = token+6;}
+            else{generateToken(TOKEN_IDENTIFIER);}
+            break;            
+        case 'e':
+            if(checkKeyword("lse", 3, TOKEN_ELSE)){token = token+3;}
+            else if(checkKeyword("ndl", 3, TOKEN_ENDL)){token = token+3;}
+            else{generateToken(TOKEN_IDENTIFIER);}            
+            break;
+        case 'f':
+            if(checkKeyword("or", 2, TOKEN_FOR)){
+                token = token+2;}              
+            else if(checkKeyword("alse", 4, TOKEN_FALSE)){
+                token = token+4;}
+            else{generateToken(TOKEN_IDENTIFIER);}          
+            break;
+        case 'g':
+            if(checkKeyword("oto", 3, TOKEN_GOTO)){
+                token = token+3;}              
+            else{generateToken(TOKEN_IDENTIFIER);}          
+            break;
+        case 'i':
+            if(checkKeyword("f", 1, TOKEN_IF)){token++;}
+            else
+            if(checkKeyword("nt", 2, TOKEN_VAR)){
+                token = token+ 2;}
+            else{generateToken(TOKEN_IDENTIFIER);}          
+            break;            
+        case 'n':
+            if(checkKeyword("il", 2, TOKEN_NIL)){token = token+2;}
+            else{generateToken(TOKEN_IDENTIFIER);}
+            break;
+        case 'p':
+            if(checkKeyword("rint", 4, TOKEN_PRINT)){
+                token = token+4;}
+            else if(!checkKeyword("in", 2, TOKEN_PIN)){
+                    generateToken(TOKEN_IDENTIFIER);}               
+            break;
+        case 'r':
+            if(checkKeyword("eturn", 5, TOKEN_RETURN)){token = token+5;}
+            else{generateToken(TOKEN_IDENTIFIER);}
+            break;
+        case 's':
+            if(checkKeyword("witch", 5, TOKEN_SWITCH)){
+                token = token+5;
+            }else            
+            if(checkKeyword("tring", 5, TOKEN_STRINGVAR)){  
+                token = token+5;}           
+            else{generateToken(TOKEN_IDENTIFIER);}
+            break;            
+        case 't':
+            if(checkKeyword("rue", 3, TOKEN_TRUE)){token = token+3;}
+            else{generateToken(TOKEN_IDENTIFIER);}
+            break;
+        case 'w':
+            if(checkKeyword("hile", 4, TOKEN_WHILE)){token = token+4;}
+            else{generateToken(TOKEN_IDENTIFIER);}
+            break;
+        case 'v':
+            if(checkKeyword("oid", 3, TOKEN_VOID)){token = token+3;}
+            else{generateToken(TOKEN_IDENTIFIER);}
+            break;            
+        default:
+            generateToken(TOKEN_IDENTIFIER);
+            break;
+    }
+}
 void charToken();
-bool isAlphabet(char a);
+bool isAlphabet(char A){
+    if((A>='a' && A<='z') || (A>= 'A' && A<= 'Z') || A =='_'){
+     return true;
+    }
+    else{
+     return false;
+    }
+    
+}
 void makeToken(TokenType type);
 void scanner(char* buffer){
     token=buffer;
