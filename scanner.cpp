@@ -2,9 +2,17 @@
 #include <iostream>
 #include "token.h"
 using namespace std;
-
+int parenCount=0;
+int braceCount=0;
 int line =1;
 char *token;
+bool end_of_file(){
+  if(token[0]='\0'){
+    return true;
+  }
+  return false;
+  
+}
 
 static void skipToken(char A){
     while((!(end_of_file()))&&!(token[0]==A)){
@@ -24,15 +32,6 @@ static void skipToken(char A,char B){
         token=token+2;
     }
 }
-bool end_of_file(){
-  if(token[0]='\0'){
-    return true;
-  }
-  return false;
-  
-}
-
-
 
 void skip_whitespace(){
  switch(*token){
@@ -196,6 +195,207 @@ bool isAlphabet(char A){
     
 }
 void makeToken(TokenType type);
+static void checkField(int type){
+    switch(type){
+        case 1:
+        if(parenCount ==0){
+            error("unexpected ')' on line",line);
+        }
+        break;
+        case 2:
+        if(parenCount!=0){
+            error("unexpected { on line",line);
+        }
+        break;
+        case 3:
+        if(braceCount ==0){
+            error("unexoected '}' on line ",line);
+        }
+        if(parenCount!=0){
+            error("unexpected '}' on line",line);
+        }
+        break;
+        
+    }
+}
+static void charToken(){
+    if(end_of_file()){
+        return;}
+    switch(*token){
+        case '(':
+        checkField(0);
+        parenCount++;
+        makeToken(TOKEN_LEFT_PAREN);
+        break;
+        case ')':
+        checkField(1);
+        parenCount--;
+        makeToken(TOKEN_RIGHT_PAREN);
+        break;
+        case '{':
+        checkField(2);
+        braceCount++;
+        makeToken(TOKEN_LEFT_BRACE);
+        break;
+        case '}':
+        checkField(3);
+        makeToken(TOKEN_RIGHT_BRACE);
+        braceCount--;
+        break;
+        case ';':
+        if(token[1] == ';'){
+        generateToken(TOKEN_INFINITE);
+        token++;
+        }else{      
+        makeToken(TOKEN_SEMICOLON);}
+        break;
+        case ',':
+        makeToken(TOKEN_COMMA);
+        break;
+        case '.':
+        makeToken(TOKEN_DOT);
+        break;
+        case '-':
+        if(token[1] == '+'){
+        makeToken(TOKEN_SUB);
+        token++;
+        }else
+        if(token[1] == '-'){
+        makeToken(TOKEN_SUB_SELF);
+        token++; 
+        }else
+        if(token[1] == '='){
+        makeToken(TOKEN_SUB_ASS);
+        token++;                         
+        }else{
+        makeToken(TOKEN_SUB);
+        }          
+        break;
+        case '+':
+        if(token[1] == '+'){
+        makeToken(TOKEN_ADD_SELF);
+        token++;
+        }else
+        if(token[1] == '-'){
+        makeToken(TOKEN_SUB);
+        token++; 
+        }else
+        if(token[1] == '='){
+        makeToken(TOKEN_ADD_ASS);
+        token++;                          
+        }else{
+        makeToken(TOKEN_PLUS);
+        }          
+        break;
+        case '/':
+        if(token[1] == '='){
+        makeToken(TOKEN_SLASH_ASS);
+        token++;                          
+        }else{
+        makeToken(TOKEN_SLASH);
+        }          
+        break;        
+        case '*':
+        if(token[1] == '='){
+        makeToken(TOKEN_STAR_ASS);
+        token++;                          
+        }else{
+        makeToken(TOKEN_STAR);
+        }          
+        break;  
+        case ':':
+        makeToken(TOKEN_COLON);
+        break;
+        case '?':
+        makeToken(TOKEN_TENARY);
+        break; 
+        case '^':
+        if(token[1] == '='){
+            makeToken(TOKEN_ASS_XOR);
+            token++;
+        }else{
+            makeToken(TOKEN_BIT_XOR);
+        }  
+        case '~':
+        makeToken(TOKEN_INVERSE);
+        break;
+        case '%':
+        makeToken(TOKEN_MODULUS);
+        break;
+        case '[':
+        makeToken(TOKEN_LEFT_BLOCK);
+        break;
+        case ']':
+        makeToken(TOKEN_RIGHT_BLOCK);
+        break;
+        case '"':
+        token++;
+        generateToken(TOKEN_STRING);
+        break;
+        case '!':
+        if(token[1] == '='){
+            makeToken(TOKEN_BANG_EQUAL);
+            token++;
+        }else{
+            makeToken(TOKEN_BANG);
+        }          
+        break;
+        case '&':
+        if(token[1] == '&'){
+            makeToken(TOKEN_LOGICAL_AND);
+            token++;
+        }else if(token[1] == '='){
+            makeToken(TOKEN_ASS_AND);
+            token++;                  
+        }else{
+            makeToken(TOKEN_BIT_AND);
+        }          
+        break;  
+        case '|':
+        if(token[1] == '|'){
+            makeToken(TOKEN_LOGICAL_OR);
+            token++;
+        }else if(token[1] == '='){
+            makeToken(TOKEN_ASS_OR);
+            token++;                  
+        }else{
+            makeToken(TOKEN_BIT_OR);
+        }          
+        break;                        
+        case '=':
+        if(token[1] == '='){
+            makeToken(TOKEN_EQUAL_EQUAL);
+            token++;
+        }else{
+            makeToken(TOKEN_EQUAL);
+        }          
+        break;
+        case '<':
+        if(token[1] == '='){
+            makeToken(TOKEN_LESS_EQUAL);
+            token++;
+        }else if(token[1] == '<'){
+            makeToken(TOKEN_SHIFT_LEFT);
+            token++;                
+        }else{
+            makeToken(TOKEN_LESS);
+        }          
+        break;
+        case '>':
+        if(token[1] == '='){
+            makeToken(TOKEN_GREATER_EQUAL);
+            token++;
+        }else if(token[1] == '>'){
+            makeToken(TOKEN_SHIFT_RIGHT);
+            token++;                  
+        }else{
+            makeToken(TOKEN_GREATER);
+        }          
+        break;  
+        default:
+        skip_whitespace();                   
+    }
+}
 void scanner(char* buffer){
     token=buffer;
     while(!end_of_file()){
