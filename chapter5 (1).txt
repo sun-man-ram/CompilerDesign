@@ -1,0 +1,41 @@
+Welcome in our last tutorial we saw how the scanner scans whitspaces and how it checks if we are at the end of file, now in this tutorial we would scan numbers, keyword and identifiers. 
+ 
+So, Lets begin, We start by defining the isNum function. This function returns true if the  current token is a number.
+We pass our  token as argument to it. To check if it is a number, it first of all converts it from char to integer by subtracting zero from it and assigning it to integer A. Then it checks if the value is between 0 and 9. it returns true if it is an integer else it returns false.
+
+so in our scanner function, if the current token returns true for isnum function. then we pass it to the generate token function. this function will check the rest of the tokens to know if they are also numbers and generate token number.  
+
+In the case of multiple integers example 200, 49389, 28389. The generate token will loop through our  token and merge all of them together.
+
+the first token of every keyword and identifier is an alphabet. 
+To check for alphabet we use the isAlphabet function, we simply check if it is between ‘a’ and ‘z’ or between ‘A’ and ‘Z’ or an ‘_’ char. If it is an alphabet we call the keywordToken function.
+
+Next let us now define the keywordToken function. 
+Just between the scanner function and isAlphabet function we define the keywordToken function. It will be a static void function because it is private to the script and does not return any item. Already, the isAlphabet function which called this function has already found the first letter of the keyword to be an alphabet. So using a switch we will match the first letter.
+
+ If it matches the first letter of any keyword then we use the checkKeyword function to check the rest of the keyword. 
+
+Example consider break and bool whose first letters is a 'b'. if the current token is ‘b’, then the checkKeyword function will check for ‘reak‘ and ‘ool’ without their first letter 'b' since it has already passed the switch. 
+
+At the end of the switch case, if no keyword is matched we generate TOKEN_IDENTIFIER.
+
+The checkKeyword takes three arguments. 1. Is the characters to check for , example in the case of break , it will only check for ‘reak’. 2. How many characters to chec for, in the case of ‘reak’, they are only four characters and finally 3. the type of token we are generating, in the case of break the name of the token is TOKEN_BREAK. 
+
+the checkkeyword will call the maketoken function to generate the token if the rest of the tokens match and also return true. when it returns true, we will now skip the generated token to point to the next token. so the number we increment is equivalent to the number of the remaining characters of the token, example for 'break', we skip 'reak' which is equivalent to four. 
+
+After the first letter of every keyword, the checkKeyword function checks the rest of the characters of the keyword. It is a Boolean function that returns true if it found the keyword else it is false.
+
+The first thing this function does on line 84, is to make sure whatever comes after the keyword is neither an alphabet nor a number example. ‘breaks’, ‘break1’,  ‘breaka’,  ‘break25’ does not represent the keyword break but: ‘break=’, ‘break()’, ‘break;’ all represent the keyword. So line 84 makes sure that whatever comes after the keyword is neither an alphabet nor a number. 
+To do this, it adds the total number of token to the current  token and checks it on line 89. Example for TOKEN_BREAK, the numChar is equal to four, if the first letter ‘b’ is at position 0, then we add 4+1, to  token. So that  token becomes 5 which is the character that comes after ‘k’ the last letter of break. then we check the character at this position to make sure its neither a number or an alphabet. 
+On line 86, we use a for loop which loops through the rest of the tokens comparing it with the actual name of the token we want to generate. If at any position they do not match, the checkKeyword function returns false else it exits the loops and returns true.
+
+They are special case tokens, the ‘endl’ which in c++ is equivalent to a new line. we will convert it to TOKEN_STRING and assigned ‘/n’ since it represents a new line in c++. The TOKEN_PIN is a customized token I created for the brainIO project on my website. Kindly ignore any instances of TOKEN_PIN in this lectures since it is not a standard c++ syntax.
+So if the checkKeyword matched , we call the makeToken function and pass the TOKEN_TYPE as argument and return true. 
+back to our keywordtoken function.
+If none of the first letter is a match or if the first letter is a match but the rest of the token is not a match , then it is an identifier , therefore we generate token identifier. 
+identifiers are user defined names, while keywords are standard language defined names.
+
+As the compiler designer it is your duty to define what keyword you need in your programming language.  
+So now we have seen how the scanner scans for keywords and identifiers , in our next tutorial we will scan for symbols.
+
+Please, if you find any part confusing, as a student please send me an email ; ezeuko.arinze@projectfpga.com . avoid leaving a bad review, it took a great deal of hardwork to arrange this course. if you enjoy it, please give it a five star and a nice review.
