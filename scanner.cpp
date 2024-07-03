@@ -1,90 +1,211 @@
 #include <bits/stdc++.h>
-#include <iostream>
-#include "token.h"
+#include "parser.h"
 using namespace std;
-int parenCount=0;
-int braceCount=0;
-int line =1;
-char *token;
-bool end_of_file(){
-  if(token[0]='\0'){
-    return true;
-  }
-  return false;
-  
-}
+char* token;
+int line = 1;
+int lineNo = 1;
+int parenCount = 0;
+int braceCount = 0;
+int deleteOld = 0;
+TokenType previousToken;
+string tokenNames[] = {
+"TOKEN_EQUAL",  "TOKEN_LOGICAL_OR", "TOKEN_LOGICAL_AND", "TOKEN_EQUAL_EQUAL", 
+"TOKEN_GREATER","TOKEN_GREATER_EQUAL",  "TOKEN_LESS", 
+"TOKEN_LESS_EQUAL", "TOKEN_BANG_EQUAL", 
 
+ "TOKEN_COLON", "TOKEN_TENARY",
+
+ "TOKEN_ADD_ASS", "TOKEN_SUB_ASS", "TOKEN_SLASH_ASS", 
+"TOKEN_STAR_ASS", "TOKEN_ASS_OR", "TOKEN_ASS_XOR", "TOKEN_ASS_AND",
+
+"TOKEN_BIT_OR",  "TOKEN_BIT_XOR", "TOKEN_BIT_AND", 
+"TOKEN_SHIFT_LEFT", "TOKEN_SHIFT_RIGHT", "TOKEN_INVERSE",
+"TOKEN_PLUS", "TOKEN_SUB",   "TOKEN_SLASH", "TOKEN_MODULUS",  "TOKEN_STAR", 
+"TOKEN_BANG", "TOKEN_SUB_SELF", "TOKEN_ADD_SELF",
+
+ // Single-character "TOKENs.
+ "TOKEN_LEFT_PAREN", "TOKEN_RIGHT_PAREN",
+ "TOKEN_LEFT_BRACE", "TOKEN_RIGHT_BRACE",
+
+ "TOKEN_COMMA", "TOKEN_DOT", "TOKEN_SEMICOLON",
+ "TOKEN_START", "TOKEN_END",
+ // One or two character "TOKENs.
+ // Literals.
+  "TOKEN_BOOL", "TOKEN_VAR", "TOKEN_STRINGVAR", 
+  "TOKEN_IDENTIFIER", "TOKEN_STRING", "TOKEN_NUMBER",
+  "TOKEN_PIN","TOKEN_FALSE", "TOKEN_TRUE", "TOKEN_FUNCALL",
+  "TOKEN_OUTPUT","TOKEN_ENDL",
+ // Keywords.
+"TOKEN_INFINITE",   "TOKEN_FUN", 
+ "TOKEN_VOID", "TOKEN_LEFT_BLOCK", "TOKEN_RIGHT_BLOCK",
+
+"TOKEN_BREAK", "TOKEN_CONTINUE",  "TOKEN_SWITCH", 
+ "TOKEN_CASE", "TOKEN_DEFAULT", "TOKEN_ELSE",
+ "TOKEN_FOR", "TOKEN_IF", "TOKEN_NIL", 
+ "TOKEN_PRINT", "TOKEN_RETURN", "TOKEN_WHILE", "TOKEN_HYPHEN",
+ "TOKEN_ERROR", "TOKEN_COUT","TOKEN_GOTO", "TOKEN_EOF"
+};
+
+void writeFile(string Data){
+    int n = Data.length();
+    char char_array[n + 1];
+    strcpy(char_array, Data.c_str());
+
+    FILE *Files ;
+    if(deleteOld == 0){
+        deleteOld++;
+        if (Files = fopen("tokens.txt", "r")) {
+            fclose(Files);
+            if (remove("tokens.txt") == 0){            
+            }
+        }
+    }
+    Files = fopen("tokens.txt", "a");
+	fputs(char_array, Files);
+    fputs("\n", Files);
+	fclose(Files);
+}
+void makeToken(TokenType type){
+    string code =   "("+to_string(lineNo)+").  " + tokenNames[type] +"--"+ to_string(line); 
+    lineNo++;   
+    writeFile(code); 
+    // sendToparser(type, line); 
+    previousToken = type; 
+}
+void makeToken(string tokenData, TokenType type){
+    if(tokenData==""){tokenData = " ";}
+    string code = "("+to_string(lineNo)+").  " +tokenNames[type] +"--"+ to_string(line) +"--"+ tokenData;
+    lineNo++;
+    writeFile(code); 
+    // sendToparser(type, line,  tokenData);
+    previousToken = type;        
+}
+static bool end_of_file(){
+    if(token[0] == '\0'){
+        return true;
+    };    
+    return false;
+}
 static void skipToken(char A){
-    while((!(end_of_file()))&&!(token[0]==A)){
+
+    while((!end_of_file())&& !(token[0] == A)){
         token++;
     }
     if(end_of_file()){
-     error("unexpected end of file on line",line);
+        // error("Unexpected end of file on line", line);
     }
 }
-static void skipToken(char A,char B){
-    while((!(end_of_file()))&& (!(token[0]==A)&&(token[1]==B))){
+static void skipToken(char A, char B){
+    while((!end_of_file())&& !((token[0]== A)&&(token[1] == B))){
         token++;
-    }token++;
-    if(end_of_file()){
-        error("unexpecter end of file on line",line);
-    }else{
-        token=token+2;
-    }
+    }token++;  
+        if(end_of_file()){            
+        // error("Unexpected end of file on line", line);
+    }else{token = token + 2;
+        }
+    
 }
+static void skip_whitespace(){
 
-void skip_whitespace(){
- switch(*token){
-    case ' ':
-    token++;
-    skip_whitespace();
-    break;
-    case '\r':
-    token++;
-    skip_whitespace();
-    break;
-    case '\t':
-    token++;
-    skip_whitespace();
-    break;
-    case '\n':
-    token++;
-    line++;
-    skip_whitespace();
-    break;
-    case '/':
-    if(token[1] == '/'){
-        token++;
-        skipToken('\n');
-        line++;
+    switch(*token){
+        case ' ':
+            token++;
+            skip_whitespace();
+            break;
+        case '\r':
+            token++;
+            skip_whitespace();
+            break;
+        case '\t':
+            token++;
+            skip_whitespace();
+            break;            
+        case '\n':
+            token++;
+            line++;
+            skip_whitespace();
+            break;
+        case '/':
+            if(token[1] == '/'){
+                token++;
+                skipToken('\n');
+                line++;
+            }else if(token[1] == '*'){
+                token++;
+                skipToken('*', '/');
+                line++;
+            }else{makeToken(TOKEN_SLASH);
+            token++;};
+            skip_whitespace();
+            break;
+        default:
+            break;
     }
-    else if(token[1] == '*'){
-        token++;
-        skipToken('*','/');
-        line++;
-    }
-    else{
-        makeToken(TOKEN_SLASH);
-        token++;
-    }
-    skip_whitespace();
-    break;
-   default:
-    break;
-   
- }
 }
-void generateToken(TokenType type);
-bool isNum(char B){
-    // to convert thr char type to integer we subract it with 0 and assign to integer
-
-   int A=B-'0';
-   if(A >=0 && A<=9 ){
-     return true;
-   }
-   else{
-      return false;
-   }
+static bool isNum(char B){
+    int A = B - '0';
+    if(A >= 0 && A <= 9 ){
+        return true;
+    }else{ return false;}
+}
+static bool isAlphabet(char A){
+    if((A >= 'a' && A <= 'z') || (A >= 'A' && A <= 'Z') || A == '_'){
+        return true;
+    }else{ return false;}
+};
+static void generateToken(TokenType type){
+    string tokenData = "";
+    if(type == TOKEN_NUMBER){
+        while((!end_of_file())&&(isNum(*token))){
+            tokenData = tokenData + token[0]; 
+            token++;
+        }
+        token--;
+        if(end_of_file()){
+            // error("Unexpected end of file on line ", line);
+        } else {
+            makeToken(tokenData, TOKEN_NUMBER);
+        }           
+    }else
+    if(type == TOKEN_INFINITE){
+        tokenData = "1";
+        makeToken(tokenData, TOKEN_NUMBER);    
+    }else 
+    if(type == TOKEN_STRING){      
+        while((!end_of_file())&&(*token != '"')){
+            tokenData = tokenData + token[0]; 
+            token++;
+        }
+        if(token[0] == '"'){
+            makeToken(tokenData, TOKEN_STRING);
+        }
+        else{
+            // error("expecting double quotes on line", line);
+        }
+    }
+    else 
+    if(type == TOKEN_IDENTIFIER){      
+      while((!end_of_file())&&(isNum(*token)||isAlphabet(*token)||*token == '_'))
+      {     tokenData = tokenData + token[0]; 
+            token++; 
+        }token--;          
+        if(end_of_file()){
+            // error("Unterminated identifier on line", line);
+        }
+        else 
+        if((token[1] == '(')
+        &&((previousToken == TOKEN_VAR)||(previousToken == TOKEN_BOOL)
+        ||( previousToken == TOKEN_VOID)||(previousToken == TOKEN_PIN)
+        ||(previousToken == TOKEN_STRING))){
+            makeToken(tokenData, TOKEN_FUN);
+        }
+        else
+        if(token[1] == '('){
+            makeToken(tokenData, TOKEN_FUNCALL);
+        }else {
+            makeToken(tokenData, TOKEN_IDENTIFIER); 
+        }                                           
+    }  
 }
 static bool checkKeyword(string charValue, int numChar, TokenType type){
     if(!(isAlphabet(token[numChar+1])) && !(isNum(token[numChar+1]))){
@@ -184,38 +305,18 @@ static void keywordToken(){
             break;
     }
 }
-void charToken();
-bool isAlphabet(char A){
-    if((A>='a' && A<='z') || (A>= 'A' && A<= 'Z') || A =='_'){
-     return true;
-    }
-    else{
-     return false;
-    }
-    
-}
-void makeToken(TokenType type);
 static void checkField(int type){
     switch(type){
         case 1:
-        if(parenCount ==0){
-            error("unexpected ')' on line",line);
-        }
+        // if(parenCount == 0){error("Unexpected ')' on line ", line);}
         break;
         case 2:
-        if(parenCount!=0){
-            error("unexpected { on line",line);
-        }
-        break;
+        // if(parenCount != 0){error("Unexpected '{' on line ", line);}
+        break;        
         case 3:
-        if(braceCount ==0){
-            error("unexoected '}' on line ",line);
-        }
-        if(parenCount!=0){
-            error("unexpected '}' on line",line);
-        }
-        break;
-        
+        // if(braceCount == 0){error("Unexpected '}' on line ", line);}
+        // if(parenCount != 0){error("Unexpected '}' on line ", line);} 
+        break; 
     }
 }
 static void charToken(){
@@ -397,21 +498,27 @@ static void charToken(){
     }
 }
 void scanner(char* buffer){
-    token=buffer;
+
+    token = buffer;
+
     while(!end_of_file()){
-        skip_whitespace();
-        if(isNum(*token)){
+        
+        skip_whitespace();    
+        if(isNum(*token)){         
             generateToken(TOKEN_NUMBER);
-        }
-        else if(isAlphabet(*token)){
+        }else 
+        if(isAlphabet(*token)){
             keywordToken();
-        }
-        else{
+        }else{
             charToken();
         }
         token++;
     }
     if(end_of_file()){
         makeToken(TOKEN_EOF);
-    }
+        }
+
 }
+
+
+

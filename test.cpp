@@ -1,4 +1,9 @@
+void testfunction(int sampleInteger){
+  cout<<"hello world again";
+}
 int main(){
-  int a=2+3;
-    return 0;
+  string start="hello world compiler";
+  int sampleInteger=320;
+  int secondInteger=300+sampleInteger;
+  testfunction(sampleInteger);
 }
